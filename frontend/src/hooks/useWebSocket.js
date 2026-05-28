@@ -1,7 +1,10 @@
 import { useEffect, useRef, useCallback } from 'react'
 
-const WS_PROTOCOL = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-const WS_URL = `${WS_PROTOCOL}//${window.location.host}/ws`
+const RENDER_URL = import.meta.env.VITE_RENDER_URL || ''
+const WS_PROTOCOL = window.location.protocol === 'https:' || RENDER_URL ? 'wss:' : 'ws:'
+const WS_URL = RENDER_URL
+  ? `${WS_PROTOCOL}//${RENDER_URL}/ws`
+  : `${WS_PROTOCOL}//${window.location.host}/ws`
 
 export default function useWebSocket(onMessage) {
   const ws = useRef(null)

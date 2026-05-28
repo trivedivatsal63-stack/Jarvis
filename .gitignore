@@ -8,6 +8,14 @@ __pycache__/
 dist/
 build/
 
+# SQLite databases
+*.db
+
+# Audio files
+*.mp3
+*.wav
+*.ogg
+
 # ChromaDB vector data
 chroma_db/
 
@@ -17,6 +25,17 @@ chroma_db/
 # Node
 node_modules/
 frontend/dist/
+
+# Old root-level scripts (moved to backend/)
+/app.py
+/background.py
+/config.py
+/main.py
+/speak.py
+/system_control.py
+/text_generator.py
+/voice_input.py
+/templates/
 
 # IDE
 .vscode/

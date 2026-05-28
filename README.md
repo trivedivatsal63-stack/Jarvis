@@ -212,27 +212,51 @@ Open http://localhost:5173 in your browser.
 
 ## Deployment
 
-### Railway (recommended for MVP)
+### Render (Backend) + Vercel (Frontend) — Free Tier
+
+#### Backend → Render
+
 1. Push to GitHub
-2. Create a Railway project from the repo
-3. Add a **Redis** plugin
-4. Set environment variables in Railway dashboard
-5. Deploy — Railway auto-detects `requirements.txt`
+2. Go to [render.com](https://render.com), sign up with GitHub
+3. Click **New → Web Service** → connect your repo
+4. Set:
+   - **Name**: `jarvis-backend`
+   - **Runtime**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT`
+5. Under **Advanced**, add environment variables (all your keys from `.env`)
+6. Deploy → `https://jarvis-backend.onrender.com`
 
-### What runs where:
-| Component | Port | Service |
-|-----------|------|---------|
-| Backend (FastAPI) | 8000 | Railway web service |
-| Frontend (Vite) | 5173 | Railway + static hosting or separate service |
-| Redis | — | Railway Redis plugin |
+> **Note**: Heavy optional features (ChromaDB vector memory, YOLO vision, face recognition) are excluded from the default build to fit the 512MB memory limit. They work automatically if you install the extra dependencies locally.
 
-### Frontend build for production:
+#### Frontend → Vercel
+
+1. Go to [vercel.com](https://vercel.com), sign up with GitHub
+2. **Add New → Project** → connect your repo
+3. Set:
+   - **Root Directory**: `frontend`
+   - **Framework Preset**: `Vite`
+   - **Build Command**: `npm run build`
+4. Add environment variables:
+   ```
+   VITE_RENDER_URL=jarvis-backend.onrender.com
+   ```
+5. Deploy → `https://jarvis.vercel.app`
+
+> **Note**: REST API calls (`/api/*`) are proxied to Render via `vercel.json` rewrites. WebSocket connects directly to Render using `VITE_RENDER_URL`.
+
+#### Keep it awake
+
+Render free tier sleeps after 15 minutes of inactivity. Use [uptimerobot.com](https://uptimerobot.com) (free) to ping `https://jarvis-backend.onrender.com/health` every 5 minutes.
+
+#### Optional Heavy Dependencies
+
+For ChromaDB vector memory, YOLOv8 vision, or face recognition, install:
 ```bash
-cd frontend
-npm run build    # outputs to frontend/dist/
+pip install chromadb sentence-transformers ultralytics face_recognition opencv-python-headless
 ```
 
-Serve `frontend/dist/` via Railway's static hosting or a simple Express/nginx server.
+These gracefully degrade when not installed (all features still work, just without those specific capabilities).
 
 ## Project Structure
 
